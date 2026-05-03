@@ -1,0 +1,27 @@
+:root {
+  --color-primary: #1a1a2e;
+  --color-primary-light: #2d2d4e;
+  --color-accent: #c8a96e;
+  --color-accent-light: #dfc38a;
+  --color-accent-dark: #a88a52;
+  --color-status-green: #2d6a4f;
+  --color-status-green-bg: #d8f3dc;
+  --color-status-yellow: #b5800d;
+  --color-status-yellow-bg: #fff3cd;
+  --color-status-red: #c0392b;
+  --color-status-red-bg: #fde8e6;
+  --color-bg: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-muted: #9ca3af;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-input: 8px;
+  --sidebar-width: 256px;
+  --header-height: 64px;
+  --font-arabic: 'Tajawal', 'Cairo', sans-serif;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
