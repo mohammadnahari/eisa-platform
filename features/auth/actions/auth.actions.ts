@@ -29,10 +29,11 @@ export async function getSession() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
+  const profile = profileData as import('@/lib/types/database.types').Database['public']['Tables']['profiles']['Row'] | null
   return { user, profile }
 }

@@ -2,6 +2,9 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import type { UserRole } from '@/lib/types/database.types'
+
+type ProfileRole = { role: UserRole }
 
 export default function VerifyPage() {
   const router = useRouter()
@@ -10,11 +13,12 @@ export default function VerifyPage() {
   useEffect(() => {
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        const { data: profile } = await supabase
+        const { data: profileData } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', session.user.id)
           .single()
+        const profile = profileData as ProfileRole | null
         const home = profile?.role === 'admin' ? '/admin' : profile?.role === 'coach' ? '/coach' : '/client'
         router.push(home)
       }

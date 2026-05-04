@@ -18,7 +18,7 @@ export function useAuth() {
       .select('*')
       .eq('id', userId)
       .single()
-    setProfile(data)
+    setProfile(data as Profile | null)
   }, [supabase])
 
   useEffect(() => {

@@ -2,6 +2,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import type { UserRole } from '@/lib/types/database.types'
+
+type ProfileRow = { role: UserRole }
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -21,7 +24,8 @@ export default function LoginPage() {
     if (mode === 'password') {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) { setError('البريد الإلكتروني أو كلمة المرور غير صحيحة'); setLoading(false); return }
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
+      const { data: profileData } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
+      const profile = profileData as ProfileRow | null
       const home = profile?.role === 'admin' ? '/admin' : profile?.role === 'coach' ? '/coach' : '/client'
       router.push(home)
     } else {
