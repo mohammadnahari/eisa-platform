@@ -185,9 +185,9 @@ export default function LandingPage() {
         </div>
         <div style={S.pathCards}>
           {/* Executive */}
-          <div style={{ ...S.pathCard, ':hover': {} }} onClick={() => selectPath('executive')}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = '#C9A84C', e.currentTarget.style.transform = 'translateY(-6px)')}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(201,168,76,0.18)', e.currentTarget.style.transform = 'none')}>
+          <div style={S.pathCard} onClick={() => selectPath('executive')}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#C9A84C'; e.currentTarget.style.transform = 'translateY(-6px)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(201,168,76,0.18)'; e.currentTarget.style.transform = 'none' }}>
             <span style={S.pathIcon}>🏢</span>
             <h3 style={{ ...S.pathTitle, color: '#C9A84C' }}>القيادي والتنفيذي</h3>
             <p style={S.pathDesc}>أنت في موقع قيادي وتريد الارتقاء بأدائك، اتخاذ قرارات أكثر وضوحاً، وبناء تأثير يدوم.</p>
