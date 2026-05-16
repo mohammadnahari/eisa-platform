@@ -1,232 +1,99 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/lib/types/database.types'
+import { usePathname } from 'next/navigation'
+import type { ProfileRow, UserRole } from '@/lib/types/database.types'
+import LogoutButton from '@/components/auth/LogoutButton'
 
-type Profile = Database['public']['Tables']['profiles']['Row']
-type UserRole = 'admin' | 'coach' | 'client'
-
-type NavItem = {
-  href: string
-  label: string
-  icon: string
+const NAV: Record<UserRole, { label: string; href: string; icon: string }[]> = {
+  admin: [
+    { label: 'لوحة الإحصاء', href: '/admin', icon: '📊' },
+    { label: 'المستخدمون', href: '/admin/users', icon: '👥' },
+    { label: 'العملاء', href: '/admin/clients', icon: '🎯' },
+    { label: 'الطلبات الواردة', href: '/admin/leads', icon: '📥' },
+    { label: 'الجلسات', href: '/admin/sessions', icon: '📅' },
+    { label: 'المنتجات', href: '/admin/products', icon: '📦' },
+    { label: 'الإشعارات', href: '/admin/notifications', icon: '🔔' },
+    { label: 'الإعدادات', href: '/admin/settings', icon: '⚙️' },
+  ],
+  coach: [
+    { label: 'لوحة المتابعة', href: '/coach', icon: '📊' },
+    { label: 'عملائي', href: '/coach/clients', icon: '🎯' },
+    { label: 'الجلسات', href: '/coach/sessions', icon: '📅' },
+    { label: 'الأهداف', href: '/coach/goals', icon: '🏆' },
+    { label: 'التحديثات', href: '/coach/updates', icon: '📝' },
+  ],
+  client: [
+    { label: 'رحلتي', href: '/client', icon: '🗺' },
+    { label: 'جلساتي', href: '/client/sessions', icon: '📅' },
+    { label: 'أهدافي', href: '/client/goals', icon: '🏆' },
+    { label: 'تحديثاتي', href: '/client/updates', icon: '📝' },
+  ],
 }
 
-const ROLE_LABEL: Record<UserRole, string> = {
-  admin: 'لوحة المدير',
-  coach: 'لوحة الموجّه',
-  client: 'بوابة العميل',
-}
+const ROLE_LABEL: Record<UserRole, string> = { admin: 'مدير النظام', coach: 'موجّه', client: 'عميل' }
+const ROLE_BADGE_COLOR: Record<UserRole, string> = { admin: '#5B8DEF', coach: '#C9A84C', client: '#4CAF7D' }
 
-const ADMIN_NAV: NavItem[] = [
-  { href: '/admin', label: 'لوحة التحكم', icon: '⊞' },
-  { href: '/admin/users', label: 'المستخدمون', icon: '👥' },
-  { href: '/admin/transfers', label: 'طلبات النقل', icon: '↔️' },
-  { href: '/admin/pricing', label: 'الأسعار', icon: '💰' },
-  { href: '/admin/communications', label: 'الاتصالات', icon: '📨' },
-  { href: '/admin/security', label: 'الأمان', icon: '🔒' },
-  { href: '/admin/audit-log', label: 'سجل الأحداث', icon: '📋' },
-  { href: '/admin/settings', label: 'الإعدادات', icon: '⚙️' },
-]
-
-const COACH_NAV: NavItem[] = [
-  { href: '/coach', label: 'لوحتي', icon: '⊞' },
-  { href: '/coach/clients', label: 'عملائي', icon: '👤' },
-  { href: '/coach/leads', label: 'المرشحون', icon: '🌱' },
-  { href: '/coach/sessions', label: 'الجلسات', icon: '📅' },
-  { href: '/coach/reports', label: 'التقارير', icon: '📊' },
-  { href: '/coach/engagement', label: 'الانخراط', icon: '🔥' },
-  { href: '/coach/practice', label: 'ممارستي', icon: '📈' },
-  { href: '/coach/settings/connections', label: 'الإعدادات', icon: '⚙️' },
-]
-
-const CLIENT_NAV: NavItem[] = [
-  { href: '/client', label: 'رحلتي', icon: '🗺️' },
-  { href: '/client/update', label: 'التحديث الأسبوعي', icon: '✍️' },
-  { href: '/client/sessions', label: 'جلساتي', icon: '📅' },
-  { href: '/client/stages', label: 'المراحل', icon: '🏆' },
-  { href: '/client/billing', label: 'المدفوعات', icon: '💳' },
-]
-
-const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
-  admin: ADMIN_NAV,
-  coach: COACH_NAV,
-  client: CLIENT_NAV,
-}
-
-function normalizeRole(role: Profile['role']): UserRole {
-  if (role === 'admin' || role === 'coach' || role === 'client') {
-    return role
-  }
-
-  return 'client'
-}
-
-function isActivePath(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`)
-}
-
-export function Sidebar({ profile }: { profile: Profile }) {
+export default function Sidebar({ profile }: { profile: ProfileRow }) {
   const pathname = usePathname()
-  const router = useRouter()
-  const [isSigningOut, setIsSigningOut] = useState(false)
-
-  const supabase = useMemo(() => createClient(), [])
-  const role = normalizeRole(profile.role)
-  const nav = NAV_BY_ROLE[role]
-
-  const displayName = profile.full_name?.trim() || profile.email?.trim() || 'User'
-  const displayEmail = profile.email?.trim() || ''
-  const avatarInitial = displayName.charAt(0).toUpperCase()
-
-  async function handleSignOut() {
-    if (isSigningOut) return
-
-    setIsSigningOut(true)
-
-    try {
-      await supabase.auth.signOut()
-      router.push('/login')
-      router.refresh()
-    } catch {
-      window.location.href = '/login'
-    }
-  }
+  // Safe nullable access
+  const displayName = profile.full_name ?? profile.email ?? 'مستخدم'
+  const initial = displayName.charAt(0).toUpperCase()
+  const navItems = NAV[profile.role] ?? []
 
   return (
-    <aside
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        width: 'var(--sidebar-width)',
-        height: '100vh',
-        background: 'var(--color-primary)',
-        display: 'flex',
-        flexDirection: 'column',
-        zIndex: 50,
-        borderLeft: '1px solid rgba(255,255,255,0.08)',
-      }}
-    >
-      <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <h1 style={{ color: 'var(--color-accent)', fontWeight: 800, fontSize: 'var(--font-size-lg)' }}>
-          عيسى للتدريب
-        </h1>
-
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 'var(--font-size-xs)', marginTop: '0.25rem' }}>
-          {ROLE_LABEL[role]}
-        </p>
+    <aside style={S.sidebar}>
+      {/* Brand */}
+      <div style={S.brand}>
+        <div style={S.brandName}>عيسى للتدريب</div>
+        <div style={S.brandSub}>منصة التدريب التنفيذي</div>
+        <div style={{ ...S.roleBadge, background: `${ROLE_BADGE_COLOR[profile.role]}18`, border: `1px solid ${ROLE_BADGE_COLOR[profile.role]}40`, color: ROLE_BADGE_COLOR[profile.role] }}>
+          {ROLE_LABEL[profile.role]}
+        </div>
       </div>
 
-      <nav style={{ flex: 1, padding: '1rem 0.75rem', overflowY: 'auto' }} aria-label="Main navigation">
-        {nav.map((item) => {
-          const isActive = isActivePath(pathname, item.href)
-
+      {/* Navigation */}
+      <nav style={S.nav}>
+        {navItems.map(item => {
+          const isActive = pathname === item.href || (item.href !== '/admin' && item.href !== '/coach' && item.href !== '/client' && pathname.startsWith(item.href))
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? 'page' : undefined}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.625rem 0.875rem',
-                borderRadius: '8px',
-                marginBottom: '0.25rem',
-                color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.7)',
-                background: isActive ? 'rgba(200,169,110,0.12)' : 'transparent',
-                textDecoration: 'none',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: isActive ? 700 : 400,
-                transition: 'all 0.15s',
-              }}
-            >
-              <span style={{ fontSize: '1rem' }} aria-hidden="true">
-                {item.icon}
-              </span>
+            <Link key={item.href} href={item.href} style={{ ...S.navItem, ...(isActive ? S.navActive : {}) }}>
+              <span style={S.navIcon}>{item.icon}</span>
               <span>{item.label}</span>
             </Link>
           )
         })}
       </nav>
 
-      <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              background: 'var(--color-accent)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-primary)',
-              fontWeight: 800,
-              fontSize: 'var(--font-size-sm)',
-              flexShrink: 0,
-            }}
-            aria-hidden="true"
-          >
-            {avatarInitial}
-          </div>
-
-          <div style={{ minWidth: 0 }}>
-            <p
-              style={{
-                color: '#fff',
-                fontSize: 'var(--font-size-sm)',
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-              title={displayName}
-            >
-              {displayName}
-            </p>
-
-            {displayEmail && (
-              <p
-                style={{
-                  color: 'rgba(255,255,255,0.4)',
-                  fontSize: 'var(--font-size-xs)',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-                title={displayEmail}
-              >
-                {displayEmail}
-              </p>
-            )}
+      {/* User footer */}
+      <div style={S.footer}>
+        <div style={S.userRow}>
+          <div style={S.avatar}>{initial}</div>
+          <div style={S.userInfo}>
+            <div style={S.userName}>{displayName}</div>
+            <div style={S.userRole}>{profile.email}</div>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={handleSignOut}
-          disabled={isSigningOut}
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '6px',
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 'var(--font-size-xs)',
-            cursor: isSigningOut ? 'not-allowed' : 'pointer',
-            fontFamily: 'var(--font-arabic)',
-            opacity: isSigningOut ? 0.7 : 1,
-          }}
-        >
-          {isSigningOut ? 'جارٍ تسجيل الخروج...' : 'تسجيل الخروج'}
-        </button>
+        <LogoutButton />
       </div>
     </aside>
   )
+}
+
+const S: Record<string, React.CSSProperties> = {
+  sidebar: { width: 240, minHeight: '100vh', background: '#111', borderLeft: '1px solid rgba(201,168,76,0.15)', display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 50 },
+  brand: { padding: '24px 20px', borderBottom: '1px solid rgba(201,168,76,0.1)' },
+  brandName: { fontSize: 16, fontWeight: 700, color: '#C9A84C' },
+  brandSub: { fontSize: 11, color: 'rgba(237,232,220,0.4)', marginTop: 3 },
+  roleBadge: { display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: 1, padding: '3px 8px', borderRadius: 4, marginTop: 8 },
+  nav: { flex: 1, padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' },
+  navItem: { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 9, fontSize: 14, color: 'rgba(237,232,220,0.5)', transition: 'all 0.15s', textDecoration: 'none' },
+  navActive: { background: 'rgba(201,168,76,0.1)', color: '#C9A84C', border: '1px solid rgba(201,168,76,0.2)' },
+  navIcon: { fontSize: 16, width: 20, textAlign: 'center', flexShrink: 0 },
+  footer: { padding: '16px 12px', borderTop: '1px solid rgba(201,168,76,0.1)', display: 'flex', flexDirection: 'column', gap: 10 },
+  userRow: { display: 'flex', alignItems: 'center', gap: 10 },
+  avatar: { width: 36, height: 36, borderRadius: '50%', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: '#C9A84C', flexShrink: 0 },
+  userInfo: { flex: 1, overflow: 'hidden' },
+  userName: { fontSize: 13, fontWeight: 600, color: '#EDE8DC', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  userRole: { fontSize: 10, color: 'rgba(237,232,220,0.35)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'ltr', textAlign: 'right' },
 }

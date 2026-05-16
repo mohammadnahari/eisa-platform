@@ -1,5 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+import type { ProfileRow } from '@/lib/types/database.types'
+
+const PUBLIC_EXACT = new Set(['/', '/login', '/verify'])
+const PUBLIC_PREFIX = ['/api/auth', '/api/stripe/webhook', '/_next/', '/favicon', '/static/']
+
+function isPublic(pathname: string): boolean {
+  if (PUBLIC_EXACT.has(pathname)) return true
+  return PUBLIC_PREFIX.some((p) => pathname.startsWith(p))
+}
 
 const ROLE_HOME: Record<string, string> = {
   admin: '/admin',
@@ -16,10 +25,8 @@ export async function proxy(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
@@ -30,64 +37,42 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const isPublicPath =
-    pathname === '/' ||
-    pathname === '/login' ||
-    pathname.startsWith('/verify') ||
-    pathname.startsWith('/api/stripe/webhook') ||
-    pathname.startsWith('/api/auth')
-
-  if (isPublicPath) {
-    if (pathname === '/login' && user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (profile) {
-        return NextResponse.redirect(new URL(ROLE_HOME[profile.role] ?? '/', request.url))
-      }
+  if (user && pathname === '/login') {
+    const { data } = await supabase.from('profiles').select('role, is_active').eq('id', user.id).single()
+    const profile = data as Pick<ProfileRow, 'role' | 'is_active'> | null
+    if (!profile || profile.is_active === false) {
+      await supabase.auth.signOut()
+      return NextResponse.redirect(new URL('/login?reason=suspended', request.url))
     }
-
-    return response
+    return NextResponse.redirect(new URL(ROLE_HOME[profile.role] ?? '/', request.url))
   }
+
+  if (isPublic(pathname)) return response
 
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const url = new URL('/login', request.url)
+    url.searchParams.set('next', pathname)
+    return NextResponse.redirect(url)
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, is_active, mfa_enabled')
-    .eq('id', user.id)
-    .single()
+  const { data } = await supabase.from('profiles').select('role, is_active').eq('id', user.id).single()
+  const profile = data as Pick<ProfileRow, 'role' | 'is_active'> | null
 
-  if (!profile || !profile.is_active) {
+  if (!profile || profile.is_active === false) {
+    await supabase.auth.signOut()
     return NextResponse.redirect(new URL('/login?reason=suspended', request.url))
   }
 
-  const { role } = profile
-
-  if (pathname.startsWith('/admin') && role !== 'admin') {
-    return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
-  }
-
-  if (pathname.startsWith('/coach') && role !== 'coach') {
-    return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
-  }
-
-  if (pathname.startsWith('/client') && role !== 'client') {
-    return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
-  }
+  const role = profile.role
+  if (pathname.startsWith('/admin') && role !== 'admin') return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
+  if (pathname.startsWith('/coach') && role !== 'coach') return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
+  if (pathname.startsWith('/client') && role !== 'client') return NextResponse.redirect(new URL(ROLE_HOME[role] ?? '/', request.url))
 
   return response
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'],
 }
