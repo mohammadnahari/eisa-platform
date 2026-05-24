@@ -1,0 +1,23 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/clients/page": "app/admin/clients/page.js",
+  "/admin/leads/page": "app/admin/leads/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/sessions/page": "app/admin/sessions/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js",
+  "/admin/users/page": "app/admin/users/page.js",
+  "/api/auth/callback/route": "app/api/auth/callback/route.js",
+  "/api/stripe/webhook/route": "app/api/stripe/webhook/route.js",
+  "/client/goals/page": "app/client/goals/page.js",
+  "/client/page": "app/client/page.js",
+  "/client/sessions/page": "app/client/sessions/page.js",
+  "/client/updates/page": "app/client/updates/page.js",
+  "/coach/clients/page": "app/coach/clients/page.js",
+  "/coach/page": "app/coach/page.js",
+  "/coach/sessions/page": "app/coach/sessions/page.js",
+  "/coach/updates/page": "app/coach/updates/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js",
+  "/verify/page": "app/verify/page.js"
+}

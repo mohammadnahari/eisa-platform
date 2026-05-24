@@ -1,0 +1,23 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/clients/page": "/admin/clients",
+  "/admin/leads/page": "/admin/leads",
+  "/admin/page": "/admin",
+  "/admin/sessions/page": "/admin/sessions",
+  "/admin/settings/page": "/admin/settings",
+  "/admin/users/page": "/admin/users",
+  "/api/auth/callback/route": "/api/auth/callback",
+  "/api/stripe/webhook/route": "/api/stripe/webhook",
+  "/client/goals/page": "/client/goals",
+  "/client/page": "/client",
+  "/client/sessions/page": "/client/sessions",
+  "/client/updates/page": "/client/updates",
+  "/coach/clients/page": "/coach/clients",
+  "/coach/page": "/coach",
+  "/coach/sessions/page": "/coach/sessions",
+  "/coach/updates/page": "/coach/updates",
+  "/login/page": "/login",
+  "/page": "/",
+  "/verify/page": "/verify"
+}

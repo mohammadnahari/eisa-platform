@@ -272,3 +272,59 @@ export interface ClientWithProfile extends ClientRow {
 export interface UpdateWithClient extends WeeklyUpdateRow {
   clients: ClientRow | null
 }
+
+type TableDefinition<Row> = {
+  Row: Row
+  Insert: Partial<Row>
+  Update: Partial<Row>
+  Relationships: []
+}
+
+export type Database = {
+  public: {
+    Tables: {
+      profiles: TableDefinition<ProfileRow>
+      clients: TableDefinition<ClientRow>
+      weekly_updates: TableDefinition<WeeklyUpdateRow>
+      sessions: TableDefinition<SessionRow>
+      goals: TableDefinition<GoalRow>
+      leads: TableDefinition<LeadRow>
+      orders: TableDefinition<OrderRow>
+      products: TableDefinition<ProductRow>
+      prices: TableDefinition<PriceRow>
+      platform_settings: TableDefinition<PlatformSettingRow>
+      stage_approvals: TableDefinition<StageApprovalRow>
+      client_coaches: TableDefinition<ClientCoachRow>
+      in_app_notifications: TableDefinition<InAppNotificationRow>
+      notification_templates: TableDefinition<NotificationTemplateRow>
+      transfer_requests: TableDefinition<TransferRequestRow>
+    }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: {
+      user_role: UserRole
+      preferred_lang: PreferredLang
+      client_type: ClientType
+      client_status: ClientStatus
+      weekly_status_color: WeeklyStatusColor
+      session_type: SessionType
+      session_format: SessionFormat
+      session_status: SessionStatus
+      goal_status: GoalStatus
+      goal_axis: GoalAxis
+      lead_status: LeadStatus
+      order_status: OrderStatus
+      payment_method: PaymentMethod
+      product_type: ProductType
+      billing_interval: BillingInterval
+      stage_approval_status: StageApprovalStatus
+      coach_role: CoachRole
+      transfer_status: TransferStatus
+      notification_channel: NotificationChannel
+      notification_category: NotificationCategory
+      queue_status: QueueStatus
+      discount_type: DiscountType
+      input_type: InputType
+    }
+  }
+}
