@@ -4,6 +4,20 @@ import { FormEvent, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
+function getAppUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, '')
+
+  if (configuredUrl) {
+    return configuredUrl
+  }
+
+  if (typeof window !== 'undefined') {
+    return window.location.origin
+  }
+
+  return 'https://coach.eisaprod.com'
+}
+
 const S: Record<string, React.CSSProperties> = {
   page: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(ellipse at 30% 50%, rgba(201,168,76,0.07) 0%, transparent 60%), #080808', padding: 24 },
   card: { width: '100%', maxWidth: 420, background: '#111', border: '1px solid rgba(201,168,76,0.2)', borderRadius: 20, padding: '48px 40px', textAlign: 'center', position: 'relative', overflow: 'hidden' },
@@ -32,7 +46,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     const supabase = createClient()
-    const redirectTo = `${window.location.origin}/api/auth/callback?next=/reset-password`
+    const redirectTo = `${getAppUrl()}/api/auth/callback?next=/reset-password`
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
       redirectTo,
@@ -56,7 +70,7 @@ export default function ForgotPasswordPage() {
         <h1 style={S.title}>استعادة كلمة المرور</h1>
         <p style={S.sub}>أدخل بريدك الإلكتروني وسنرسل لك رابطًا آمنًا لتعيين كلمة مرور جديدة.</p>
 
-        {sent && <div style={S.successBox}>تم إرسال رابط إعادة تعيين كلمة المرور إذا كان البريد مسجلًا لدينا. يرجى التحقق من بريدك.</div>}
+        {sent && <div style={S.successBox}>تم استلام الطلب. إذا كان البريد الإلكتروني مسجلًا لدينا، فسيتم إرسال رابط إعادة تعيين كلمة المرور خلال دقائق.</div>}
         {error && <div style={S.errBox}>{error}</div>}
 
         <form onSubmit={handleSubmit}>
