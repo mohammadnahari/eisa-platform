@@ -55,9 +55,13 @@ export default function ForgotPasswordPage() {
     setLoading(false)
 
     if (error) {
-      setError('تعذر إرسال رابط إعادة التعيين. تحقق من البريد الإلكتروني وحاول مرة أخرى.')
-      return
-    }
+  if (error.message.toLowerCase().includes('rate limit')) {
+    setError('تم إرسال عدة طلبات خلال وقت قصير. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.')
+  } else {
+    setError('تعذر إرسال رابط إعادة التعيين حاليًا. يرجى المحاولة لاحقًا.')
+  }
+  return
+}
 
     setSent(true)
   }
