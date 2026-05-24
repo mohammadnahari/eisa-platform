@@ -4,19 +4,42 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+function getSafeNextPath() {
+  if (typeof window === 'undefined') return '/'
+
+  const params = new URLSearchParams(window.location.search)
+  const next = params.get('next')
+
+  if (!next || !next.startsWith('/') || next.startsWith('//')) {
+    return '/'
+  }
+
+  return next
+}
+
 export default function VerifyPage() {
   const router = useRouter()
   const [status, setStatus] = useState<'checking' | 'success' | 'error'>('checking')
 
   useEffect(() => {
     const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+    const nextPath = getSafeNextPath()
+
+    async function verifySession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session) {
         setStatus('success')
-        setTimeout(() => router.push('/'), 1500)
+        setTimeout(() => router.push(nextPath), 800)
+        return
       }
-    })
-    return () => subscription.unsubscribe()
+
+      setStatus('error')
+    }
+
+    verifySession()
   }, [router])
 
   return (

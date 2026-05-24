@@ -17,7 +17,9 @@
   "/coach/page": "/coach",
   "/coach/sessions/page": "/coach/sessions",
   "/coach/updates/page": "/coach/updates",
+  "/forgot-password/page": "/forgot-password",
   "/login/page": "/login",
   "/page": "/",
+  "/reset-password/page": "/reset-password",
   "/verify/page": "/verify"
 }

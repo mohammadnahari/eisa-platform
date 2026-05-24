@@ -17,7 +17,9 @@
   "/coach/page": "app/coach/page.js",
   "/coach/sessions/page": "app/coach/sessions/page.js",
   "/coach/updates/page": "app/coach/updates/page.js",
+  "/forgot-password/page": "app/forgot-password/page.js",
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
+  "/reset-password/page": "app/reset-password/page.js",
   "/verify/page": "app/verify/page.js"
 }

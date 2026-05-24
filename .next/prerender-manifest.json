@@ -50,6 +50,30 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/forgot-password": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/forgot-password",
+      "dataRoute": "/forgot-password.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/login": {
       "experimentalBypassFor": [
         {
@@ -65,6 +89,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/login",
       "dataRoute": "/login.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/reset-password": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/reset-password",
+      "dataRoute": "/reset-password.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -102,8 +150,8 @@
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "df2b4f1c5e3577324b4bc884ab2bb05b",
-    "previewModeSigningKey": "612000a8642871b6ea8242b0a2ddf9b2f7c0ad44537693a88234b8615cf2d4e3",
-    "previewModeEncryptionKey": "fd551546a2a62d1d5bde39d14afbab4a310dbaf22431f0da813def320975dc53"
+    "previewModeId": "32874da635fd7ee171afb08b8661ee58",
+    "previewModeSigningKey": "256f0b35347d3e9d62e3d00f4af28fbb5b208834a7a19045e7bb66c2504a3aae",
+    "previewModeEncryptionKey": "c2943619f3f8c2226760dea58fae01975d9470cf904dd0ee3b25460fa03d79ce"
   }
 }

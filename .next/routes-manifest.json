@@ -157,10 +157,22 @@
       "namedRegex": "^/coach/updates(?:/)?$"
     },
     {
+      "page": "/forgot-password",
+      "regex": "^/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/forgot\\-password(?:/)?$"
+    },
+    {
       "page": "/login",
       "regex": "^/login(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/reset-password",
+      "regex": "^/reset\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reset\\-password(?:/)?$"
     },
     {
       "page": "/verify",

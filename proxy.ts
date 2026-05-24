@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { ProfileRow } from '@/lib/types/database.types'
 import { getSupabaseConfig } from './lib/supabase/config'
-const PUBLIC_EXACT = new Set(['/', '/login', '/verify'])
+const PUBLIC_EXACT = new Set(['/', '/login', '/verify', '/forgot-password', '/reset-password'])
 const PUBLIC_PREFIX = ['/api/auth', '/api/stripe/webhook', '/_next/', '/favicon', '/static/']
 
 function isPublic(pathname: string): boolean {

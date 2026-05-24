@@ -28,6 +28,7 @@ export default function LoginPage() {
   const router = useRouter()
   const params = useSearchParams()
   const reason = params.get('reason')
+  const reset = params.get('reset')
   const next = params.get('next')
 
   const [email, setEmail] = useState('')
@@ -72,6 +73,7 @@ export default function LoginPage() {
         <p style={S.sub}>سجّل دخولك لمتابعة رحلتك في اتفاقية الازدهار</p>
 
         {reason === 'suspended' && <div style={S.warnBox}>حسابك موقوف. تواصل مع مسؤول المنصة.</div>}
+        {reset === 'success' && <div style={S.warnBox}>تم تحديث كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.</div>}
         {error && <div style={S.errBox}>{error}</div>}
 
         <form onSubmit={handleSubmit}>
@@ -87,6 +89,8 @@ export default function LoginPage() {
             {loading ? 'جارٍ التحقق...' : 'دخول'}
           </button>
         </form>
+
+        <Link href="/forgot-password" style={S.back}>نسيت كلمة المرور؟</Link>
 
         <Link href="/" style={S.back}>← العودة للصفحة الرئيسية</Link>
       </div>
