@@ -54,12 +54,22 @@ export default function ForgotPasswordPage() {
 
     setLoading(false)
 
-    if (error) {
-  if (error.message.toLowerCase().includes('rate limit')) {
+if (error) {
+  const authError = error as { message?: string; code?: string; status?: number }
+  const errorText = `${authError.message ?? ''} ${authError.code ?? ''} ${authError.status ?? ''}`.toLowerCase()
+
+  if (
+    authError.status === 429 ||
+    errorText.includes('rate limit') ||
+    errorText.includes('too many') ||
+    errorText.includes('over_email_send_rate_limit')
+  ) {
     setError('تم إرسال عدة طلبات خلال وقت قصير. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.')
-  } else {
-    setError('تعذر إرسال رابط إعادة التعيين حاليًا. يرجى المحاولة لاحقًا.')
+    return
   }
+
+  console.error('Password reset error:', error)
+  setError('تعذر إرسال رابط إعادة التعيين حاليًا. يرجى المحاولة لاحقًا.')
   return
 }
 
