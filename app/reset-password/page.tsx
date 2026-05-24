@@ -29,23 +29,41 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
-    const supabase = createClient()
+  const supabase = createClient()
 
-    async function checkSession() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+  async function checkSession() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-      if (!session) {
-        setError('رابط الاستعادة غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا من صفحة تسجيل الدخول.')
-        return
-      }
-
+    if (session) {
       setReady(true)
+      return
     }
 
-    checkSession()
-  }, [])
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') && session) {
+        setReady(true)
+      }
+    })
+
+    setTimeout(() => {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          setReady(true)
+        } else {
+          setError('رابط الاستعادة غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا من صفحة تسجيل الدخول.')
+        }
+      })
+    }, 1200)
+
+    return () => subscription.unsubscribe()
+  }
+
+  checkSession()
+}, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
