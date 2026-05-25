@@ -1,3 +1,0 @@
-module.exports=[33172,a=>{"use strict";var b=a.i(87924);let c={green:{label:"أخضر",bg:"rgba(76,175,125,0.12)",color:"#4CAF7D",border:"rgba(76,175,125,0.3)"},yellow:{label:"أصفر",bg:"rgba(240,192,64,0.12)",color:"#F0C040",border:"rgba(240,192,64,0.3)"},red:{label:"أحمر",bg:"rgba(224,85,85,0.12)",color:"#E05555",border:"rgba(224,85,85,0.3)"}};a.s(["default",0,function({status:a}){let d=c[a];return(0,b.jsxs)("span",{style:{display:"inline-block",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:d.bg,color:d.color,border:`1px solid ${d.border}`},children:["green"===a?"🟢":"yellow"===a?"🟡":"🔴"," ",d.label]})}])}];
-
-//# sourceMappingURL=components_ui_StatusBadge_tsx_09lbtz0._.js.map
