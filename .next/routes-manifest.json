@@ -103,6 +103,12 @@
       "namedRegex": "^/api/auth/callback(?:/)?$"
     },
     {
+      "page": "/api/public/register",
+      "regex": "^/api/public/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/public/register(?:/)?$"
+    },
+    {
       "page": "/api/stripe/webhook",
       "regex": "^/api/stripe/webhook(?:/)?$",
       "routeKeys": {},

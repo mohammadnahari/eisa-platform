@@ -8,6 +8,7 @@
   "/admin/settings/page": "app/admin/settings/page.js",
   "/admin/users/page": "app/admin/users/page.js",
   "/api/auth/callback/route": "app/api/auth/callback/route.js",
+  "/api/public/register/route": "app/api/public/register/route.js",
   "/api/stripe/webhook/route": "app/api/stripe/webhook/route.js",
   "/client/goals/page": "app/client/goals/page.js",
   "/client/page": "app/client/page.js",

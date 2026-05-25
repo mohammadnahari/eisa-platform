@@ -8,6 +8,7 @@
   "/admin/settings/page": "/admin/settings",
   "/admin/users/page": "/admin/users",
   "/api/auth/callback/route": "/api/auth/callback",
+  "/api/public/register/route": "/api/public/register",
   "/api/stripe/webhook/route": "/api/stripe/webhook",
   "/client/goals/page": "/client/goals",
   "/client/page": "/client",

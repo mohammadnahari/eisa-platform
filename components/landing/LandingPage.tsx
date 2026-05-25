@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 
 type Screen = 'hero' | 'path' | 'form' | 'success'
 type PathType = 'executive' | 'personal'
@@ -103,25 +102,37 @@ export default function LandingPage() {
   }
 
   async function submit() {
+    if (!formData.full_name.trim()) return alert('يرجى إدخال الاسم')
+    if (!formData.phone.trim()) return alert('يرجى إدخال رقم الجوال')
+    if (!formData.email.trim()) return alert('يرجى إدخال البريد الإلكتروني')
+    if (!formData.current_situation.trim() || !formData.desired_outcome.trim()) {
+      return alert('يرجى الإجابة على الأسئلة المطلوبة')
+    }
+
     setLoading(true)
+
     try {
-      const supabase = createClient()
-      await supabase.from('leads').insert({
-        full_name: formData.full_name,
-        email: formData.email || null,
-        phone: formData.phone || null,
-        source: 'website',
-        discovery_answers: {
-          path: selectedPath,
-          current_situation: formData.current_situation,
-          desired_outcome: formData.desired_outcome,
-          biggest_obstacle: formData.biggest_obstacle,
-          previous_coaching: formData.previous_coaching,
-          commitment_level: formData.commitment_level,
-        },
-        status: 'new',
+      const response = await fetch('/api/public/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          selectedPath,
+        }),
       })
+
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok || !result?.ok) {
+        console.error('Registration failed:', result)
+        alert('تعذر إرسال الطلب حالياً. يرجى المحاولة لاحقاً.')
+        return
+      }
+
       setScreen('success')
+    } catch (error) {
+      console.error('Registration request failed:', error)
+      alert('تعذر إرسال الطلب حالياً. يرجى المحاولة لاحقاً.')
     } finally {
       setLoading(false)
     }
@@ -253,7 +264,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div style={S.fRow}>
-              <label style={S.fLabel}>البريد الإلكتروني</label>
+              <label style={S.fLabel}>البريد الإلكتروني *</label>
               <input style={{ ...S.fInput, direction: 'ltr' }} value={formData.email} onChange={e => update('email', e.target.value)} placeholder="your@email.com" type="email" />
             </div>
           </>}
@@ -337,9 +348,9 @@ export default function LandingPage() {
       <div style={S.successWrap}>
         <div style={S.pulseRing}>🧭</div>
         <h2 style={S.successTitle}>وصل ملفك</h2>
-        <p style={S.successSub}>نحن نراجع ملف الاستكشاف الخاص بك.<br />ستتلقى تواصلاً خلال 24 ساعة.</p>
+        <p style={S.successSub}>تم إنشاء حسابك واستلام ملف الاستكشاف الخاص بك.<br />ستصلك رسالة لتعيين كلمة المرور والدخول إلى بوابة العملاء.</p>
         <div style={S.msgList}>
-          {['✅ تم استلام ملف الاستكشاف بنجاح', '🔍 جارٍ مراجعة طلبك من قِبل الموجّه', '📅 سيتم التواصل لتحديد جلسة الاستكشاف'].map((msg, i) => (
+          {['✅ تم إنشاء حسابك في المنصة', '📩 تم إرسال رابط تعيين كلمة المرور إلى بريدك', '🔍 جارٍ مراجعة ملف الاستكشاف من قِبل الموجّه'].map((msg, i) => (
             <div key={i} style={S.msgItem}>{msg}</div>
           ))}
         </div>
