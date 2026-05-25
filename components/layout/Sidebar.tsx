@@ -12,7 +12,7 @@ const NAV: Record<UserRole, { label: string; href: string; icon: string }[]> = {
     { label: 'العملاء', href: '/admin/clients', icon: '🎯' },
     { label: 'الطلبات الواردة', href: '/admin/leads', icon: '📥' },
     { label: 'الجلسات', href: '/admin/sessions', icon: '📅' },
-    { label: 'المنتجات', href: '/admin/products', icon: '📦' },
+    { label: 'البرامج', href: '/admin/products', icon: '📦' },
     { label: 'الإشعارات', href: '/admin/notifications', icon: '🔔' },
     { label: 'الإعدادات', href: '/admin/settings', icon: '⚙️' },
   ],
