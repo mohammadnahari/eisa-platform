@@ -13,6 +13,7 @@ const PUBLIC_EXACT = new Set([
 
 const PUBLIC_PREFIX = [
   '/api/auth',
+  '/api/public',
   '/api/stripe/webhook',
   '/_next/',
   '/favicon',
